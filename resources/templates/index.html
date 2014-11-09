@@ -1,0 +1,50 @@
+<!doctype html>
+<html>
+<head>
+    <title>Clojure Chat</title>
+</head>
+<body>
+    <h1>Clojure Chat</h1>
+    <section id="log"></section>
+    <input type="text" id="input" autofocus />
+    <input type="hidden" id="name" />
+    <input type="button" id="button" value="Send" />
+    <script>
+        function init() {
+            var log = document.getElementById("log"),
+                input = document.getElementById("input"),
+                name = document.getElementById("name").value,
+                setCallback = function(f) {
+                    document.getElementById("button").addEventListener("click", f, false);
+                    input.addEventListener("keydown", function(evt) {
+                        if (event.keyCode == 13) { f(); }
+                    });
+                }
+
+            if (name) {
+                var host = document.location.host,
+                    websocket = new WebSocket("ws://" + host + "/ws?name=" + name);
+                websocket.onmessage = function(evt) {
+                    var pre = document.createElement("pre");
+                    pre.innerHTML = evt.data
+                        .replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;');
+                    log.appendChild(pre);
+                    window.scrollTo(0, document.body.scrollHeight);
+                }
+                setCallback(function() {
+                    websocket.send(input.value);
+                    input.value = "";
+                });
+            } else {
+                log.innerHTML = "<p>What's your name?</p>";
+                setCallback(function() {
+                    window.location = "?name=" + input.value;
+                });
+            }
+        }
+        window.addEventListener("load", init, false);
+    </script>
+</body>
+</html>
