@@ -33,7 +33,7 @@
           (new-client channels channel name)
           (http/send! channel {:status 426
                                :headers {"Content-Type" "text/plain"}
-                               :body "Youo need Websockets"}))))))
+                               :body "You need Websockets"}))))))
 
 (def app
   (let [channels (atom #{})]
